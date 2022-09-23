@@ -1,0 +1,25 @@
+# R语言画热力图
+
+rm(list=ls())
+getwd()
+setwd("C:/Users/Allen/Desktop")
+library(openxlsx)
+library(pheatmap) # 本次所使用的热图绘制包，如果没有安装包，记得提前安装好\
+library(RColorBrewer) 
+
+x<-read.xlsx("heatmap.xlsx",startRow = 1)
+# View(x)
+data1 <- x[,-1]
+pheatmap(data1)
+p3<-pheatmap(data1,
+             color=brewer.pal(14,"Blues"),
+             cellwidth = 3.5,
+             cellheight = 9.5,
+             cluster_rows = FALSE,
+             cluster_cols = FALSE,
+             labels_row=c('北京','上海','南京','合肥','天津','广州','成都','杭州','武汉','沈阳','西安','郑州','重庆','长沙','青岛'),
+             fontsize = 6,
+             #display_numbers = TRUE,
+             number_color = "black",
+             show_colnames = FALSE
+)
