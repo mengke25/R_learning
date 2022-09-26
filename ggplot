@@ -1,0 +1,48 @@
+rm(list=ls())
+getwd()
+setwd("C:/Users/Allen/Desktop/tables/Rfigs")
+library(openxlsx) 
+library(RColorBrewer) 
+library(ggplot2)
+
+x<-read.xlsx("regsave.xlsx",startRow = 1)
+f <- ggplot(x,aes(pm25,coef))  + xlab("PM2.5")  + ylab("coefficient")
+
+f1 <- f + geom_ribbon(aes(ymin=ci_lower,ymax=ci_upper),color = c("black"), fill = c("gray"), linetype = 0)  +
+         geom_path(lineend = "butt", linejoin = "round", linemitre = 1,linetype = 1)   +
+         geom_point(x = x$pm25,y=x$coef)  +
+  geom_path(lineend = "butt", linejoin = "round", linemitre = 1,linetype = 5,x = x$pm25,y= x$xb)   +
+  geom_point(x = x$pm25,y=x$xb)  +
+         theme_bw() 
+f1
+
+
+
+
+v <- read.xlsx("f_l_ols.xlsx",startRow = 1)
+g <- ggplot(v,aes(ks,coef))  + xlab("PM2.5")  + ylab("coefficient")  + ylim(-0.08,0.1)
+
+g1 <- g + geom_ribbon(aes(ymin=v$ci_lower,ymax=v$ci_upper),color = c("black"), fill = c("gray"), linetype = 0)  +
+      geom_path(lineend = "butt", linejoin = "round", linemitre = 1,linetype = 1)   +
+      geom_point(x = v$ks,y=v$coef)  +
+      theme_bw()  
+g1
+
+
+
+
+
+
+m <- read.xlsx("f_l_iv.xlsx",startRow = 1)
+p <- ggplot(m,aes(ks,coef))  + xlab("PM2.5")  + ylab("coefficient")  + ylim(-0.3,0.4)
+
+p1 <- p + geom_ribbon(aes(ymin=m$ci_lower,ymax=m$ci_upper),color = c("black"), fill = c("gray"), linetype = 0)  +
+  geom_path(lineend = "butt", linejoin = "round", linemitre = 1,linetype = 2)   +
+  geom_point(x = m$ks,y=m$coef)  +
+  theme_bw()  
+p1
+
+
+
+
+
