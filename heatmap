@@ -1,25 +1,98 @@
 # R语言画热力图
-
 rm(list=ls())
 getwd()
-setwd("C:/Users/Allen/Desktop")
-library(openxlsx)
-library(pheatmap) # 本次所使用的热图绘制包，如果没有安装包，记得提前安装好\
-library(RColorBrewer) 
+setwd("D:/R_learning/heatmap")
+library(openxlsx)  #  运行之前检查是否安装install.packages("openxlsx")
+library(pheatmap)  #  运行之前检查是否安装install.packages("pheatmap")
+library(RColorBrewer)   # 运行之前检查是否安装install.packages("RColorBrewer")
 
-x<-read.xlsx("heatmap.xlsx",startRow = 1)
+x<-read.xlsx("heatmap.xlsx",sheet = "Sheet1",startRow = 1)
 # View(x)
 data1 <- x[,-1]
 pheatmap(data1)
 p3<-pheatmap(data1,
-             color=brewer.pal(14,"Blues"),
-             cellwidth = 3.5,
-             cellheight = 9.5,
+             color=brewer.pal(14,"Oranges"),
+             cellwidth = 3,
+             cellheight = 28,
              cluster_rows = FALSE,
              cluster_cols = FALSE,
-             labels_row=c('北京','上海','南京','合肥','天津','广州','成都','杭州','武汉','沈阳','西安','郑州','重庆','长沙','青岛'),
-             fontsize = 6,
+             labels_row=c('Beijing','Shanghai','Nanjing','Hefei','Tianjin','Guangzhou','Chengdu','Hangzhou','Wuhan','Shenyang','Xi`an','Zhengzhou','Chongqing','Changsha','Qingdao'),
+             fontsize = 12,
              #display_numbers = TRUE,
              number_color = "black",
-             show_colnames = FALSE
+             show_colnames = TRUE ,
+             labels_col = c("","","","","","","","","","","","","","","","","","","","","","","","","","","Jan","","","","","","","","","","","","","","","","","","","","","","","","","","","","Feb","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Mar","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Apr","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","May","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jun","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jul","","","","","","","","","","","","","","","","","","","","","","Aug","","","","","","","","","","","","","","","","","","","","Sep")
 )
+
+#month	ll
+#1	pm2522396
+#2	pm2522424
+#3	pm2522455
+#4	pm2522485
+#5	pm2522516
+#6	pm2522546
+#7	pm2522577
+#8	pm2522599
+#9	pm2522635
+
+
+rm(list=ls())
+getwd()
+setwd("D:/R_learning/heatmap")
+library(openxlsx)  #  运行之前检查是否安装install.packages("openxlsx")
+library(pheatmap)  #  运行之前检查是否安装install.packages("pheatmap")
+library(RColorBrewer)   # 运行之前检查是否安装install.packages("RColorBrewer")
+
+x<-read.xlsx("heatmap.xlsx",sheet = "Sheet2",startRow = 1)
+# View(x)
+data1 <- x[,-1]
+pheatmap(data1)
+p3<-pheatmap(data1,
+             color=brewer.pal(14,"Oranges") ,
+             cellwidth = 3,
+             cellheight = 28,
+             cluster_rows = FALSE,
+             cluster_cols = FALSE,
+             labels_row=c('Beijing','Shanghai','Nanjing','Hefei','Tianjin','Guangzhou','Chengdu','Hangzhou','Wuhan','Shenyang','Xi`an','Zhengzhou','Chongqing','Changsha','Qingdao'),
+             fontsize = 12,
+             #display_numbers = TRUE,
+             number_color = "black",
+             show_colnames = TRUE ,
+             labels_col = c("","","","","","","","","","","","","","","","","","","","","","","","","","","Jan","","","","","","","","","","","","","","","","","","","","","","","","","","","","Feb","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Mar","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Apr","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","May","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jun","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jul","","","","","","","","","","","","","","","","","","","","","","Aug","","","","","","","","","","","","","","","","","","","","Sep")
+)
+
+
+
+
+
+
+# 
+# rm(list=ls())
+# getwd()
+# setwd("D:/R_learning/heatmap")
+# library(openxlsx)  #  运行之前检查是否安装install.packages("openxlsx")
+# library(pheatmap)  #  运行之前检查是否安装install.packages("pheatmap")
+# library(RColorBrewer)   # 运行之前检查是否安装install.packages("RColorBrewer")
+# 
+# x<-read.xlsx("try.xlsx",sheet = "Sheet1",startRow = 1)
+# # View(x)
+# data1 <- x[,-1]
+# pheatmap(data1)
+# p3<-pheatmap(data1,
+#              color=brewer.pal(14,"Oranges") ,
+#              cellwidth = 40,
+#              cellheight = 25,
+#              cluster_rows = FALSE,
+#              cluster_cols = FALSE,
+#              labels_row=c('Beijing','Shanghai','Nanjing','Hefei','Tianjin','Guangzhou','Chengdu','Hangzhou','Wuhan','Shenyang','Xi`an','Zhengzhou','Chongqing','Changsha','Qingdao'),
+#              fontsize = 12,
+#              #display_numbers = TRUE,
+#              number_color = "black",
+#              show_colnames = TRUE,
+#              labels_col = c("", "Il10", "", "Il15")
+# )
+# 
+
+# c("","","","","","","","","","","","","","","","","","","","","","","","","","","Jan","","","","","","","","","","","","","","","","","","","","","","","","","","","","Feb","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Mar","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Apr","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","May","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jun","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","Jul","","","","","","","","","","","","","","","","","","","","","","Aug","","","","","","","","","","","","","","","","","","","","Sep")
+
+
