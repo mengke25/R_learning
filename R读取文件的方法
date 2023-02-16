@@ -1,0 +1,15 @@
+data <- read_excel("C:/XXX/1.xlsx", sheet = "Sheet1", col_names = TRUE)
+data <- read.table(file = 'manifest.tsv', sep = '\t', header = TRUE) 
+data <- read.csv('胃癌和癌前数据.csv')
+
+查看当前目录文件
+list.files(pattern = "\\.tsv")    # tsv格式的数据文件
+list.files(pattern = "^C")        # 以C开头的文件
+list.files(pattern = ".tsv$")     # 以.tsv结尾的文件
+
+#循环读取正式
+lf <-list.files(pattern = "report.tsv$") #以report.tsv 结尾的
+files <- gsub("\\.tsv", "", lf)   #切掉后缀.tsv，获得这些名称，为循环准备
+files
+for (i in seq_along(files))
+  assign(files[i], read.table(lf[i], sep = '\t', header = TRUE))
