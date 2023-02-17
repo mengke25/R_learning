@@ -16,6 +16,62 @@ data$lnQ <- log(1+data$Q)
 data$lnV <- log(1+data$V)
 # plot(data$lnP,data$lnQ)
 
+# 识别是否是NA，提取非NA数据到SUBSET中
+data$lnpif<-is.na(data$lnP)
+data$lnqif<-is.na(data$lnQ)
+data$lnvif<-is.na(data$lnV)
+data$ifNA <- complete.cases(data)
+data_heal <- data[data$lnqif==FALSE&data$lnvif==FALSE&data$lnpif==FALSE, c("id","hs8","Year","capt","T_hs08") ]
+
+
+# 条件赋值
+data_heal$type[data_heal$capt == 1 & data_heal$Year >= 2007 ] <- "hg2" 
+data_heal$type[data_heal$capt == 1 & data_heal$Year < 2007 ] <- "hg3" 
+data_heal$type[data_heal$capt != 1 & data_heal$Year >= 2007 ] <- "hg1" 
+data_heal$type[data_heal$capt != 1 & data_heal$Year < 2007 ] <- "hg4" 
+table(data_heal$type,data_heal$Year)
+
+
+# tapply 分组求均值/和
+data_heal_ <- data[is.na(data_heal$T_hs08) == FALSE & is.nan(data_heal$T_hs08) == FALSE , c("id","hs8","Year","capt","T_hs08") ]
+data_heal_$group_check <- as.double(runif(dim(data_heal_)[1]))
+data_heal_$group[data_heal_$group_check <= 0.25] <- "1"
+data_heal_$group[data_heal_$group_check > 0.25 & data_heal_$group_check <= 0.5] <- "2"
+data_heal_$group[data_heal_$group_check >0.5& data_heal_$group_check <= 0.75] <- "3"
+data_heal_$group[data_heal_$group_check >0.75] <- "4"
+data_heal_$lnT <- log(1+ data_heal_$T_hs08)
+tapply(data_heal_$lnT,data_heal_$group,"mean",na.rm = TRUE) 
+mean(data_heal_$lnT[data_heal_$group == "2"],na.rm = TRUE)
+tapply(data_heal_$lnT,list(data_heal_$group,data_heal_$Year),"mean",na.rm = TRUE) 
+
+# manager <- c(1, 2, 3, 4, 5)
+# country <- c("US", "US", "UK", "UK", "UK")
+# gender <- c("M", "F", "F", "M", "F")
+# age <- c(32, 45, 25, 39, 99)
+# leadership <- data.frame(manager, country, gender, age)
+# tapply(leadership$age, leadership$country, mean)	# 求在不同country水平下的age的均值
+
+
+# quantile 和 summary
+summary(data,maxsum = 20,  quantile.type = 7)
+quantile(data$lnP,seq(from = 0 ,to = 1 , by = 0.1),na.rm = TRUE)
+
+# origin-data #
+fitmod_T <- estimatr::lm_robust(T_hs08 ~ as.factor(Year) , data = data_heal[data_heal$capt !=0, ], se_type= "stata") 
+summary(fitmod_T)  
+ggcoefstats(fitmod_T,exclude.intercept = TRUE,stats.labels = FALSE)
+
+
+# hs8 year level data #
+data_heal2 <- aggregate(data_heal$T_hs08,list(data_heal$hs8,data_heal$Year),mean)
+names(data_heal2) <- c("hs8","year","meanT")
+data_heal2 <- data_heal2[is.na(data_heal2$meanT) != TRUE, c("hs8","year","meanT")]
+data_heal2$logT <- log(1+data_heal2$meanT)
+fitmod_T2 <- estimatr::lm_robust(logT ~ as.factor(year),data = data_heal2, se_type = "stata")
+summary(fitmod_T2)  
+ggcoefstats(fitmod_T2,exclude.intercept = TRUE,stats.labels = FALSE,vline = TRUE)
+boxplot(data_heal2$logT ~ as.factor(data_heal2$year))
+
 
 ##################
 ## hs8-year层面 ##
@@ -145,15 +201,15 @@ summary(fit6)
 ggcoefstats(fit6,exclude.intercept = TRUE,stats.labels = FALSE)
 
 # coefplot
-p <- ggplot(data = ddsmall_summ, mapping = aes(
-  x = cut,
-  y = mean_carat ))
-p + geom_point(size = 1.2) +
-  geom_pointrange(mapping = aes(
-    ymin = mean_carat - sd_carat,
-    ymax = mean_carat + sd_carat)) +
-  labs(x = "Cut",
-       y = "Carat")
+# p <- ggplot(data = ddsmall_summ, mapping = aes(
+#   x = cut,
+#   y = mean_carat ))
+# p + geom_point(size = 1.2) +
+#   geom_pointrange(mapping = aes(
+#     ymin = mean_carat - sd_carat,
+#     ymax = mean_carat + sd_carat)) +
+#   labs(x = "Cut",
+#        y = "Carat")
 
 
 
@@ -288,3 +344,6 @@ ggplot(DatA, aes(year, meanQ,group=BEC))+
   geom_path(lineend = "butt", linejoin = "round", stat = "identity",linemitre = 10) +
   geom_line(stat = "identity",position = "identity" ) 
 
+
+
+View(DatA)
