@@ -91,16 +91,30 @@ p <- ggplot(data = data_, mapping = aes(
 p + geom_line(stat = "density")
 
 
-  ## 密度2(加入阴影)
+## 密度2(加入阴影)
 p <- ggplot(data = data_, mapping = aes(
   x = lnmeanV, color = year_str, fill = year_str))
 p + geom_density(alpha = 0.4)
 
 
-# 基本回归
+## summarize数据
+summary(data_,maxsum = 20,  quantile.type = 7)
 
-fit <- lm(lnmeanV ~ lnmeanP,data_)
-summary(fit)   
+
+
+# 基本回归
+n <- 10
+x <- rnorm(n,1)
+y <- rnorm(n,1)
+fit_try <- lm(y ~ x)
+summary(fit_try)
+
+
+data_$ifNA <- complete.cases(data_)
+data_reg <- as.data.frame(subset(data_,data_$ifNA == TRUE))
+
+# fit <- lm(lnmeanV ~ lnmeanP, data =data_)
+# summary(fit)   
 
 fit2 <- lm(lnmeanV ~ lnmeanP, data =data_[data_$BEC==1, ])     
 summary(fit2)   
@@ -128,7 +142,7 @@ summary(fit5)
 fit6 <- estimatr::lm_robust(lnmeanV ~ as.factor(year) , data = data_[data_$BEC !=0, ], se_type= "stata") 
 summary(fit6)  
 
-ggcoefstats(fit6)
+ggcoefstats(fit6,exclude.intercept = TRUE,stats.labels = FALSE)
 
 # coefplot
 p <- ggplot(data = ddsmall_summ, mapping = aes(
@@ -269,21 +283,8 @@ ggplot(DatA,aes(x=year,y=meanQ,fill=BEC_str))+geom_bar(position="dodge",stat="id
 
 
 
-
 # 折线图
-
-ggplot(DatA0_, aes(year, meanQ))+ 
-  geom_path(lineend = "butt", linejoin = "round", linemitre = 1) +
-  ggplot_add(DatA1_, aes(year, meanQ))+ 
-  geom_path(lineend = "butt", linejoin = "round", linemitre = 1) +
-  ggplot_add(DatA2_, aes(year, meanQ))+ 
-  geom_path(lineend = "butt", linejoin = "round", linemitre = 1)
-
-
-
-
-
-
-
-
+ggplot(DatA, aes(year, meanQ,group=BEC))+ 
+  geom_path(lineend = "butt", linejoin = "round", stat = "identity",linemitre = 10) +
+  geom_line(stat = "identity",position = "identity" ) 
 
