@@ -13,3 +13,10 @@ files <- gsub("\\.tsv", "", lf)   #切掉后缀.tsv，获得这些名称，为�
 files
 for (i in seq_along(files))
   assign(files[i], read.table(lf[i], sep = '\t', header = TRUE))
+
+
+
+
+rm(list=ls())
+library(haven)
+data <- read_dta('C:/you-path/file_name.dta')
