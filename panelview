@@ -1,0 +1,136 @@
+rm(list=ls())
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer) 
+library(dplyr)
+library(ggstatsplot)
+library(panelView)
+library(fect)
+
+data(panelView)
+ls()
+
+# 画treat
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout, index = c("abb","year"), 
+#           xlab = "Year", ylab = "State", by.timing = TRUE, 
+#           legend.labs = c("No EDR", "EDR"), background = "white", 
+#           cex.main = 20, cex.axis= 8, cex.lab = 12, cex.legend = 12)
+
+
+
+panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+          data = turnout, index = c("abb","year"), 
+          xlab = "Year", ylab = "State", by.timing = TRUE, 
+          pre.post = TRUE, 
+          legend.labs = c("Control States", "Treated States (before EDR)", 
+                          "Treated States (after EDR)"))
+
+      ## 有missing
+# turnout2 <- turnout[!(turnout$year=="1924" | turnout$year=="1928" | turnout$year == "1940"),]
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout2, index = c("abb","year"), 
+#           type = "treat", leave.gap = TRUE)
+
+
+
+# 画outcome
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout, index = c("abb","year"), 
+#           type = "outcome", main = "EDR Reform and Turnout", 
+#           ylim = c(0,100),xlab = "Year", ylab = "Turnout")
+# 
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout, index = c("abb","year"), pre.post = FALSE,
+#           type = "outcome", main = "EDR Reform and Turnout", 
+#           ylim = c(0,100),xlab = "Year", ylab = "Turnout")
+
+panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+          data = turnout, index = c("abb","year"), 
+          type = "outcome", main = "EDR Reform and Turnout", 
+          legend.labs = c("Control States","Treated States (before EDR)", 
+                          "Treated States (after EDR)"))
+
+    ## 分组画outcome
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout, index = c("abb","year"), 
+#           type = "outcome", main = "EDR Reform and Turnout",
+#           by.group = TRUE, cex.main = 20, cex.main.sub = 15)
+
+# panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, 
+#           data = turnout, index = c("abb","year"), 
+#           type = "outcome", main = "EDR Reform and Turnout",
+#           by.group.side = TRUE, cex.main = 20, cex.main.sub = 15)
+
+
+
+
+# 画 X 和 Y 的关系
+
+# 1. Continuous Y, discrete D:（连续的Y，离散的X）
+panelview(turnout ~ policy_edr + policy_mail_in + policy_motor, data = turnout, 
+          index = c("abb","year"), 
+          type = "bivariate",
+          style = c("c","b"),
+          main = "EDR Reform and Turnout", ylab = "Turnout")
+
+
+panelview(lnpop ~ demo, data = capacity, index = c("country", "year"), 
+          ylim = list(c(8, 9.4), c(0.25, 0.6)), type = "bivar")
+
+  ## by unit
+panelview(turnout ~ policy_edr, data = turnout, 
+          index = c("abb","year"), ylab = "Turnout", type = "bivar",
+          by.unit = TRUE,  show.id = c(1:12))
+
+panelview(lnpop ~ demo, data = capacity,
+          index = c("country","year"), type = "bivar",
+          by.unit = TRUE, ylim = list(c(8,10), c(-2, 2)),
+          show.id = c(1:16))
+
+
+# 2. Discrete Y, discrete D:（离散的Y，离散的X）
+panelview(Y ~ D, data = simdata, index = c("id", "time"),
+          type = "bivar", theme.bw = FALSE, outcome.type = "discrete")
+
+  ## treat和时间的关系
+panelview(Y ~ D, data = simdata,
+          index = c("id", "time"),
+          type = "bivariate",
+          by.unit = TRUE,
+          theme.bw = FALSE,
+          outcome.type = "discrete",
+          id = unique(simdata$id)[1:12])
+
+
+
+# 3. Continuous Y, continuous D:（连续的X，连续的Y）
+panelview(lnpop ~ polity2, data = capacity, index = c("country", "year"), 
+          ylim = list(c(8.75,9.4), c(-0.2, 0.35)), type = "bivar")
+
+  ## by unit
+panelview(lnpop ~ polity2, data = capacity,
+          index = c("country","year"),
+          type = "bivar",
+          by.unit = TRUE,
+          theme.bw = FALSE,
+          color = c("blue","red"),
+          show.id = c(1:12))
+
+
+
+# 4. Discrete Y, continuous D（离散的X，离散的Y）
+simdata$x <- seq(0.001,0.9,0.001)
+panelview(Y ~ x, data = simdata, index = c("id", "time"),
+          type = "bivar", outcome.type = "discrete")
+
+  ## by unit
+simdata$x <- seq(0.001,0.9,0.001)
+panelview(Y ~ x, data = simdata,
+          index = c("id", "time"),
+          type = "bivar",
+          by.unit = TRUE,
+          outcome.type = "discrete",
+          lwd = 0.4,
+          id = unique(simdata$id)[1:12])
