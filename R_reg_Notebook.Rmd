@@ -1,0 +1,179 @@
+---
+title: "R 语言回归案例"
+output: html_notebook
+---
+
+尝试使用R语言对[《对外承包工程促进了装备制造业出口吗?》](https://mp.weixin.qq.com/s/YHcMhBhImTMPRaVgzluVCg)进行复刻。
+
+## 1.清除工作区加载所需的package; 导入数据
+
+```{r}
+rm(list=ls())
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer) 
+library(dplyr)
+library(ggstatsplot)
+library(panelView)
+library(fect)
+library(wooldridge)
+library(plm)
+library(stargazer)
+library(AER)
+setwd("D:/学习/UIBE_sr/10.SOE/soe_paper/soe")
+dir()
+data <- read_dta("Data_rr.dta")
+View(data)
+```
+
+## 2.check X 的情况
+
+```{r}
+panelview(lnexp_e ~ sofdi_d , 
+          data = data, index = c("iso","year"), 
+          xlab = "Year", ylab = "iso", by.timing = TRUE, 
+          pre.post = TRUE)
+```
+
+## 3.check Y 的情况
+
+```{r}
+panelview(lnexp_e ~ sofdi_d , 
+          data = data, index = c("iso","year"), 
+          type = "outcome", main = "EDR Reform and Turnout", 
+          legend.labs = c("无工程承包国家","Treated (承包之前)", 
+                          "Treated (承包之后)"))
+```
+
+## 4.check画X Y 的关系
+
+```{r}
+panelview(lnexp_e ~ sofdi_d , data = data, 
+          index = c("iso","year"), 
+          type = "bivariate",
+          style = c("c","b"),
+          main = "对外承包工程和机械设备出口", ylab = "机械设备出口额")
+```
+
+## 5.基准回归
+
+```{r}
+# 在stata中，基准回归命令是
+
+# reghdfe lnexp_e sofdi_d ,absorb(country year c.gdp_a#i.year c.gdp_s#i.year) vce(r)
+# 
+# reghdfe lnexp_e sofdi_a ,absorb(country year c.gdp_a#i.year c.gdp_s#i.year) vce(r)
+# 
+# reghdfe lnexp_e contract ,absorb(country year c.gdp_a#i.year c.gdp_s#i.year) vce(r)
+
+# 相对应的
+plm::is.pbalanced(data$iso,data$year)
+
+modfe <- plm::plm(lnexp_e ~ sofdi_d + gdp_a:as.factor(year)+ gdp_s:as.factor(year) +as.factor(year),index = c("iso", "year"),model ="within", data = data)
+summary(modfe)
+
+# 可以对比stata的回归结果，发现是一致的
+
+
+# . reghdfe lnexp_e sofdi_d ,absorb(country year c.gdp_a#i.year c.gdp_s#i.year) vce(r)
+# (MWFE estimator converged in 24 iterations)
+# 
+# HDFE Linear regression                            Number of obs   =      1,888
+# Absorbing 4 HDFE groups                           F(   1,   1699) =      12.64
+#                                                   Prob > F        =     0.0004
+#                                                   R-squared       =     0.9797
+#                                                   Adj R-squared   =     0.9774
+#                                                   Within R-sq.    =     0.0077
+#                                                   Root MSE        =     0.3484
+# 
+# ------------------------------------------------------------------------------
+#              |               Robust
+#      lnexp_e | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+# -------------+----------------------------------------------------------------
+#      sofdi_d |   .1056534   .0297161     3.56   0.000     .0473694    .1639373
+#        _cons |   13.28181   .0236188   562.34   0.000     13.23549    13.32814
+# ------------------------------------------------------------------------------
+
+# 计量模型2 和模型3 如下所示
+ modfe2 <- plm::plm(lnexp_e ~ sofdi_a1 + gdp_a:as.factor(year)+ gdp_s:as.factor(year) +as.factor(year) ,index = c("iso", "year"),model ="within", data = data)
+# summary(modfe2)
+# 
+# modfe3 <- plm::plm(lnexp_e ~ contract + gdp_a:as.factor(year)+ gdp_s:as.factor(year) + as.factor(year) ,index = c("iso", "year"),model ="within", data = data)
+# summary(modfe3)
+
+
+```
+
+## 6.回归结果拟合图
+
+```{r}
+modfe_fit <- fitted(modfe2)
+ 
+plot(data$lnexp_e , data$sofdi_a1)
+lines(data$lnexp_e, modfe_fit, col = "red")
+#arrows(data$lnexp_e, modfe_fit, data$lnexp_e, data$sofdi_a1,
+ #      length = 0.1, col = "blue")
+```
+
+## 7.回归结果的输出
+
+```{r}
+plm::is.pbalanced(data$iso,data$year)
+
+modfe <- plm::plm(lnexp_e ~ sofdi_d + gdp_a:as.factor(year)+ gdp_s:as.factor(year) +as.factor(year),index = c("iso", "year"),model ="within", data = data)
+result1<- summary(modfe)
+result1[["coefficients"]]
+
+```
+
+## 8.回归命令参考
+
+```{r}
+# 基本回归命令
+# reg lwage i.numdep
+# lm(lwage ~ as.factor(numdep), data= wage1)    
+
+# reg lwage c.educ#c.exper
+# lm(lwage ~ educ:exper, data =wage1) 
+
+# reg lwage c.educ##c.exper   // return full factorial specification
+# lm(lwage ~ educ*exper, data =wage1) 
+
+# reg lwage c.exper##i.numdep // return full, interact continuous and categorical
+# lm(wage ~ exper*as.factor(numdep),data = wage1)     
+```
+
+```{r}
+# 面板回归命令
+# xtset id year
+# plm::is.pbalanced(murder$id,murder$year)
+
+# xtreg mrdrte unem, fe  // fixed effects regressi
+# modfe <- plm::plm(mrdrte ~ unem,index = c("id", "year"),model ="within", data = murder)
+```
+
+```{r}
+# 工具变量
+# ivreg lwage (educ = fatheduc), first
+# ivreg lwage (educ = fatheduc)
+
+# modiv <- AER::ivreg(lwage ~ educ |fatheduc, data = mroz) 
+# summary(modiv, diagnostics = TRUE)  
+```
+
+```{r}
+# 非线性
+# logit inlf nwifeinc educ
+# mod_log <- glm(inlf~nwifeinc + educ+ family=binomial(link="logit"),data=mroz)     
+
+# probit inlf nwifeinc educ
+# mod_pro <- glm(inlf~nwifeinc + educ+ family=binomial(link="probit"),data=mroz)   
+
+# tobit hours nwifeinc educ, ll(0)
+# mod_tob <- AER::tobit(hours ~ nwifeinc + educ, left = 0, data = mroz) 
+
+# margin
+# margins::prediction(mod_pro)
+# margins::prediction(mod1, at = list(exper = seq(1,51,10)))    
+```
