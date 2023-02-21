@@ -1,0 +1,128 @@
+
+rm(list = ls())
+setwd("D:/R_learning/try_wits_ly")
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer) 
+library(dplyr)
+library(ggstatsplot)
+
+
+data <- read.csv('DataJobID-2436703_2436703_ly20230220.csv')
+
+mydata_2012 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2012.in.1000.USD.)
+mydata_2013 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2013.in.1000.USD.)
+mydata_2014 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2014.in.1000.USD.)
+mydata_2015 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2015.in.1000.USD.)
+mydata_2016 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2016.in.1000.USD.)
+mydata_2017 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2017.in.1000.USD.)
+mydata_2018 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2018.in.1000.USD.)
+mydata_2019 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2019.in.1000.USD.)
+mydata_2020 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2020.in.1000.USD.)
+mydata_2021 <- data.frame(data$ReporterISO3,data$ProductCode,data$PartnerISO3,data$TradeFlowName,data$X2021.in.1000.USD.)
+
+names(mydata_2012) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2013) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2014) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2015) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2016) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2017) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2018) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2019) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2020) <- c("iso_i","hs","iso_j","imex","value")
+names(mydata_2021) <- c("iso_i","hs","iso_j","imex","value")
+
+mydata_2012$year <- 2012
+mydata_2013$year <- 2013
+mydata_2014$year <- 2014
+mydata_2015$year <- 2015
+mydata_2016$year <- 2016
+mydata_2017$year <- 2017
+mydata_2018$year <- 2018
+mydata_2019$year <- 2019
+mydata_2020$year <- 2020
+mydata_2021$year <- 2021
+
+
+# #新变量的代码,导出复制到新Untitled执行
+# #【生成新tax】
+# a=list()
+# for (i in seq_along(files)){
+#   a[[i]]=cbind(assign(paste0('q',i),
+#                       gsub('W',files[i],"W$tax <- paste(W$name,'=',W$taxID)")))
+# }
+# a
+# a2 <- unlist(a)
+# a2 <- as.data.frame(a2)
+# write.csv(a2,'w1.csv')
+# 
+# ##【保留两个变量】
+# #b <- b[,c('tax','numUniqueReads')]
+# b=list()
+# for (i in seq_along(files)){
+#   b[[i]] <- cbind(assign(paste0('q',i), 
+#                          paste0(files[i], '<-', files[i],
+#                                 "[,c('tax','numUniqueReads')]")))
+# }
+# b
+# b2 <- unlist(b)
+# b2 <- as.data.frame(b2)
+# write.csv(b2,'w2.csv')
+# 
+# #改名字
+# #names(a)[2] <- 'Control105A'
+# c <- list()
+# for (i in seq_along(files)){
+#   c[[i]] <- cbind(assign(paste0('q',i), 
+#                          paste0('names(',files[i], ')[2] <- ','"', files[i])))
+# }
+# c
+# c2 <- unlist(c)
+# c2 <- as.data.frame(c2)
+# c2
+# c2[,1] <- sub(pattern = "_report$", replacement = "\\1", c2[,1]) 
+# c2
+# c2[,1] <- paste0(c2[,1],'"')
+# c2
+# write.csv(c2,'w3.csv')
+# 详见：https://blog.csdn.net/weixin_46623488/article/details/120450434
+
+
+mydata <- rbind(mydata_2012,mydata_2013,mydata_2014,mydata_2015,mydata_2016,mydata_2017,mydata_2018,mydata_2019,mydata_2020,mydata_2021)
+
+rm(mydata_2012,mydata_2013,mydata_2014,mydata_2015,mydata_2016,mydata_2017,mydata_2018,mydata_2019,mydata_2020,mydata_2021)
+
+
+import <- as.data.frame(subset(mydata,mydata$imex == "Import"))
+export <- as.data.frame(subset(mydata,mydata$imex == "Export"))
+
+list <-which(rowSums(is.na(import)) > 0) 
+import_NA <- import[list,]#提取有缺失值的行。
+import_A <- import[-list,]# 产生无缺失值的行。
+
+list <-which(rowSums(is.na(export)) > 0) 
+export_NA <- export[list,]#提取有缺失值的行。
+export_A <- export[-list,]# 产生无缺失值的行。
+
+
+rm(import_NA,export_NA,list)
+
+export_A$lnex <- log(1+export_A$value)
+import_A$lnim <- log(1+import_A$value)
+
+
+# 时间趋势
+fit <- lm(lnex ~ as.factor(year), data = export_A) 
+ggcoefstats(fit,exclude.intercept = TRUE,stats.labels = FALSE)
+
+
+
+
+# p <- ggplot(data = export_A, mapping = aes(
+#   x = lnex, y = year))
+# p + geom_jitter(width = 0, height = 0.3, alpha = 0.5)
+
+
+
+
+
