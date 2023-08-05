@@ -323,3 +323,4 @@ p3<-pheatmap(data1,
              number_format = "%.0f",
              fontsize_number = 14
 )
+ 
