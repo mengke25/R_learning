@@ -1,7 +1,7 @@
 data <- read_excel("C:/XXX/1.xlsx", sheet = "Sheet1", col_names = TRUE)
 data <- read.table(file = 'manifest.tsv', sep = '\t', header = TRUE) 
 data <- read.csv('胃癌和癌前数据.csv')
-
+read_excel
 查看当前目录文件
 list.files(pattern = "\\.tsv")    # tsv格式的数据文件
 list.files(pattern = "^C")        # 以C开头的文件
