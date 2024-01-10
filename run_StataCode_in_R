@@ -1,0 +1,32 @@
+library(haven)
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer) 
+library(dplyr)
+library(ggstatsplot)
+library(conflicted)
+library(dplyr)
+library(readxl)
+library(tidyverse)
+
+library(RStata)
+options("RStata.StataPath"='D:/stata18/StataMP-64')
+options("RStata.StataVersion"=18)
+
+rm(list = ls())
+
+path <- 'C:/Users/Allen/Desktop'
+setwd(path)
+
+regdata <- read_dta("data.dta")
+
+dotext <- '
+  reghdfe y x ,noa vce(r)
+  outreg2 using out.doc,dec(2) se
+  erase out.doc
+  erase out.txt
+  tw (scatter y x)
+  graph export "scatter.png",as(png) replace 
+'
+
+stata(dotext, data.in = regdata, data.out = TRUE)
